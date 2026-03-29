@@ -19,13 +19,11 @@ def create_app():
     from .auth import auth as auth_blueprint
     from .products import products as products_blueprint
     from .cart import cart as cart_blueprint
-    from .orders import orders as orders_blueprint
-    from .admin import admin as admin_blueprint
+        # from .orders import orders as orders_blueprint
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(products_blueprint)
     app.register_blueprint(cart_blueprint)
-    app.register_blueprint(orders_blueprint)
-    app.register_blueprint(admin_blueprint)
+        # app.register_blueprint(orders_blueprint)
 
     return app
