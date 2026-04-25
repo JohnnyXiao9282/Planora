@@ -6,7 +6,7 @@ Planora is a full-stack web application for a digital template marketplace. User
 
 
 
-## Backend## Features
+## Backend- Features
 
 - **Framework:** Flask (Python)- User signup/login
 
