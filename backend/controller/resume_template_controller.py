@@ -10,9 +10,6 @@ def add_cors_headers(response):
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     return response
 
-@resume_template_bp.route('/ping', methods=['GET'])
-def ping():
-    return 'pong', 200
 
 @resume_template_bp.route('/resume-templates', methods=['GET'])
 def list_resume_templates():
@@ -29,6 +26,7 @@ def get_resume_template(template_id):
             return jsonify(t)
     return jsonify({'error': 'Template not found'}), 404
 
+# TODO: For users to create their own resumes
 @resume_template_bp.route('/resume-templates', methods=['POST'])
 def create_resume_template():
     # TODO: Create a new resume template from request data
