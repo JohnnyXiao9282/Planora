@@ -9,9 +9,9 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Call backend API to login user
-    // On success:
-    navigate("/dashboard");
+  // TODO: Call backend API to login user
+  // On success:
+  navigate("/home");
   };
 
   return (
