@@ -1,15 +1,17 @@
 import type React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Call backend API to login user
     // On success:
-    // navigate('/dashboard');
+    navigate('/dashboard');
   };
 
   return (
