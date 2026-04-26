@@ -11,7 +11,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     // TODO: Call backend API to login user
     // On success:
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   return (
