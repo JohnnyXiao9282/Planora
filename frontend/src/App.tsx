@@ -15,22 +15,25 @@ import Profile from "./pages/Profile";
 import TemplateDetail from "./pages/TemplateDetail";
 import Home from "./pages/Home";
 import "./App.css";
+import { CartProvider } from "./context/CartContext";
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-  <Route path="/" element={<Navigate to="/register" replace />} />
-  <Route path="/home" element={<Home />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/template/:templateId" element={<TemplateDetail />} />
-      </Routes>
-    </Router>
+    <CartProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/register" replace />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/template/:templateId" element={<TemplateDetail />} />
+        </Routes>
+      </Router>
+    </CartProvider>
   );
 };
 

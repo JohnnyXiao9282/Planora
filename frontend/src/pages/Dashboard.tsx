@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 import "../App.css";
 
 interface ResumeTemplateCard {
@@ -12,6 +13,12 @@ interface ResumeTemplateCard {
 const Dashboard = () => {
   const [templates, setTemplates] = useState<ResumeTemplateCard[]>([]);
   const navigate = useNavigate();
+  const { cart, addToCart } = useCart();
+
+  // Add to cart: use context, which syncs with backend
+  const handleAddToCart = (template: ResumeTemplateCard) => {
+    addToCart(template);
+  };
 
   useEffect(() => {
     fetch("/resume-templates")
@@ -79,9 +86,11 @@ const Dashboard = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
           minHeight: "70vh",
+          marginLeft: 60,
+          marginTop: 40,
         }}
       >
         <div
@@ -89,58 +98,97 @@ const Dashboard = () => {
             display: "flex",
             gap: 32,
             flexWrap: "wrap",
-            justifyContent: "center",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
           }}
         >
-          {templates.map((t) => (
-            <button
-              key={t.template_id}
-              style={{
-                background: "#fff",
-                borderRadius: 12,
-                boxShadow: "0 2px 12px rgba(60,60,130,0.10)",
-                padding: 24,
-                minWidth: 260,
-                maxWidth: 320,
-                margin: 12,
-                cursor: "pointer",
-                transition: "box-shadow 0.2s",
-                border: "1px solid #e0e7ef",
-                textAlign: "left",
-              }}
-              onClick={() => navigate(`/template/${t.template_id}`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ")
-                  navigate(`/template/${t.template_id}`);
-              }}
-              tabIndex={0}
-              type="button"
-            >
-              <h2 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h2>
-              <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
+          {templates.map((t) => {
+            const inCart = cart.some(
+              (item) => item.template_id === t.template_id
+            );
+            return (
               <div
+                key={t.template_id}
                 style={{
-                  fontWeight: 700,
-                  color: "#43cea2",
-                  fontSize: 18,
-                  marginTop: 12,
+                  background: "#fff",
+                  borderRadius: 12,
+                  boxShadow: "0 2px 12px rgba(60,60,130,0.10)",
+                  padding: 24,
+                  minWidth: 260,
+                  maxWidth: 320,
+                  margin: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  border: "1px solid #e0e7ef",
+                  textAlign: "left",
                 }}
               >
-                ${t.price}
-              </div>
-              <div style={{ marginTop: 16, textAlign: "right" }}>
-                <span
+                {/* Selection button */}
+                <button
+                  type="button"
+                  onClick={() => handleAddToCart(t)}
+                  disabled={inCart}
                   style={{
-                    color: "#185a9d",
-                    textDecoration: "underline",
-                    fontWeight: 500,
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: inCart ? "#43cea2" : "#e0e7ef",
+                    color: inCart ? "#fff" : "#185a9d",
+                    fontWeight: 700,
+                    fontSize: 18,
+                    cursor: inCart ? "default" : "pointer",
+                    boxShadow: "0 1px 4px rgba(60,60,130,0.10)",
+                    transition: "background 0.2s, color 0.2s",
+                  }}
+                  title={inCart ? "Added to cart" : "Add to cart"}
+                  aria-label={inCart ? "Added to cart" : "Add to cart"}
+                >
+                  {inCart ? "✓" : "+"}
+                </button>
+                <h2 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h2>
+                <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    color: "#43cea2",
+                    fontSize: 18,
+                    marginTop: 12,
                   }}
                 >
-                  View
-                </span>
+                  ${t.price}
+                </div>
+                <div style={{ marginTop: 16, textAlign: "right" }}>
+                  <button
+                    type="button"
+                    style={{
+                      color: "#185a9d",
+                      textDecoration: "underline",
+                      fontWeight: 500,
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      fontSize: "inherit",
+                    }}
+                    onClick={() => navigate(`/template/${t.template_id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        navigate(`/template/${t.template_id}`);
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    View
+                  </button>
+                </div>
               </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>
