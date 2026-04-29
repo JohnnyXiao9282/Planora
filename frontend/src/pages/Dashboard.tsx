@@ -27,14 +27,22 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(120deg, #e0e7ef 0%, #b6c6e6 100%)",
+      }}
+    >
       <nav
         style={{
           display: "flex",
           alignItems: "center",
-          background: "#185a9d",
+          padding: "1.5rem 2rem 1rem 2rem",
+          background: "linear-gradient(90deg, #185a9d 0%, #43cea2 100%)",
           color: "#fff",
-          padding: "1rem 2rem",
+          fontWeight: 700,
+          fontSize: "1.7rem",
+          letterSpacing: "1px",
         }}
       >
         <span
