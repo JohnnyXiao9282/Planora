@@ -37,7 +37,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ template_id: item.template_id }),
-      credentials: "include"
+      credentials: "include",
     })
       .then((res) => res.json())
       .then(() => {
@@ -51,8 +51,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = (template_id: string) => {
-    setCart((prev) => prev.filter((t) => t.template_id !== template_id));
-    // TODO: Implement backend remove if needed
+    fetch("http://localhost:5050/cart/remove", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ template_id }),
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then(() => {
+        // Always re-fetch cart from backend after remove
+        fetch("http://localhost:5050/cart", { credentials: "include" })
+          .then((res) => res.json())
+          .then((data) => setCart(data || []))
+          .catch(() => setCart([]));
+      })
+      .catch(() =>
+        setCart((prev) => prev.filter((t) => t.template_id !== template_id))
+      );
   };
 
   return (

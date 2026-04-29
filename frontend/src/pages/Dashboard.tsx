@@ -124,31 +124,26 @@ const Dashboard = () => {
                   textAlign: "left",
                 }}
               >
-                {/* Selection button */}
                 <button
                   type="button"
                   onClick={() => handleAddToCart(t)}
                   disabled={inCart}
                   style={{
-                    position: "absolute",
-                    top: 12,
-                    right: 12,
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    border: "none",
-                    background: inCart ? "#43cea2" : "#e0e7ef",
+                    marginTop: 10,
+                    width: "100%",
+                    padding: "10px 0",
+                    fontSize: 16,
+                    fontWeight: 600,
                     color: inCart ? "#fff" : "#185a9d",
-                    fontWeight: 700,
-                    fontSize: 18,
+                    background: inCart ? "#43cea2" : "#e0e7ef",
+                    border: "none",
+                    borderRadius: 8,
                     cursor: inCart ? "default" : "pointer",
-                    boxShadow: "0 1px 4px rgba(60,60,130,0.10)",
-                    transition: "background 0.2s, color 0.2s",
+                    transition: "all 0.2s ease",
                   }}
-                  title={inCart ? "Added to cart" : "Add to cart"}
-                  aria-label={inCart ? "Added to cart" : "Add to cart"}
+                  aria-label={inCart ? "Carted" : "Add to cart"}
                 >
-                  {inCart ? "✓" : "+"}
+                  {inCart ? "Carted" : "Add to Cart"}
                 </button>
                 <h2 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h2>
                 <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
@@ -162,7 +157,15 @@ const Dashboard = () => {
                 >
                   ${t.price}
                 </div>
-                <div style={{ marginTop: 16, textAlign: "right" }}>
+                <div
+                  style={{
+                    marginTop: 16,
+                    textAlign: "right",
+                    display: "flex",
+                    gap: 16,
+                    justifyContent: "flex-end",
+                  }}
+                >
                   <button
                     type="button"
                     style={{
@@ -184,6 +187,28 @@ const Dashboard = () => {
                     tabIndex={0}
                   >
                     View
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      color: "#fff",
+                      background:
+                        "linear-gradient(90deg, #185a9d 0%, #43cea2 100%)",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "6px 18px",
+                      fontWeight: 600,
+                      fontSize: "inherit",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onClick={() =>
+                      navigate("/checkout", {
+                        state: { selectedIds: [t.template_id] },
+                      })
+                    }
+                  >
+                    Buy Now
                   </button>
                 </div>
               </div>

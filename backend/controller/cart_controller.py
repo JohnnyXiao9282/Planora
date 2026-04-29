@@ -43,3 +43,15 @@ def add_to_cart():
 		cart.append(template)
 		session['cart'] = cart
 	return jsonify({'success': True, 'cart': cart})
+
+# Remove a template from the cart
+@cart_bp.route('/cart/remove', methods=['POST'])
+def remove_from_cart():
+	data = request.get_json()
+	template_id = data.get('template_id')
+	if not template_id:
+		return jsonify({'error': 'No template_id provided'}), 400
+	cart = get_session_cart()
+	new_cart = [t for t in cart if t['template_id'] != template_id]
+	session['cart'] = new_cart
+	return jsonify({'success': True, 'cart': new_cart})

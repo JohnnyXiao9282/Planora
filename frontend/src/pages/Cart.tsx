@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 
-
 const Cart: React.FC = () => {
-  const { cart } = useCart();
+  const { cart, removeFromCart } = useCart();
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
@@ -30,12 +29,19 @@ const Cart: React.FC = () => {
 
   const handleCheckout = () => {
     // Optionally, you can pass selected items via state or context
-    navigate('/checkout');
+    navigate("/checkout");
   };
 
   const totalPrice = cart
     .filter((item) => selectedItems.has(item.template_id))
     .reduce((sum, item) => sum + item.price, 0);
+
+  const handleRemoveSelected = () => {
+    Array.from(selectedItems).forEach((id) => {
+      removeFromCart(id);
+    });
+    setSelectedItems(new Set());
+  };
 
   return (
     <div
@@ -135,7 +141,9 @@ const Cart: React.FC = () => {
                 transition: "all 0.3s ease",
               }}
             >
-              {selectedItems.size === cart.length ? "Deselect All" : "Select All"}
+              {selectedItems.size === cart.length
+                ? "Deselect All"
+                : "Select All"}
             </button>
           )}
         </div>
@@ -225,32 +233,57 @@ const Cart: React.FC = () => {
             alignItems: "center",
             justifyContent: "space-between",
             zIndex: 1000,
+            gap: 24,
           }}
         >
           <div style={{ fontSize: "18px", fontWeight: 600 }}>
-            <span style={{ color: "#666" }}>Selected: {selectedItems.size} item(s)</span>
-            <span style={{ marginLeft: "30px", color: "#43cea2", fontSize: "24px" }}>
+            <span style={{ color: "#666" }}>
+              Selected: {selectedItems.size} item(s)
+            </span>
+            <span
+              style={{ marginLeft: "30px", color: "#43cea2", fontSize: "24px" }}
+            >
               Total: ${totalPrice.toFixed(2)}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={handleCheckout}
-            style={{
-              padding: "14px 40px",
-              fontSize: "18px",
-              fontWeight: 700,
-              color: "#fff",
-              background: "linear-gradient(90deg, #185a9d 0%, #43cea2 100%)",
-              border: "none",
-              borderRadius: "10px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 4px 12px rgba(67, 206, 162, 0.3)",
-            }}
-          >
-            Checkout Now
-          </button>
+          <div style={{ display: "flex", gap: 16 }}>
+            <button
+              type="button"
+              onClick={handleRemoveSelected}
+              style={{
+                padding: "14px 32px",
+                fontSize: "17px",
+                fontWeight: 600,
+                color: "#fff",
+                background: "#e74c3c",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(231, 76, 60, 0.15)",
+              }}
+            >
+              Remove
+            </button>
+            <button
+              type="button"
+              onClick={handleCheckout}
+              style={{
+                padding: "14px 40px",
+                fontSize: "18px",
+                fontWeight: 700,
+                color: "#fff",
+                background: "linear-gradient(90deg, #185a9d 0%, #43cea2 100%)",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(67, 206, 162, 0.3)",
+              }}
+            >
+              Checkout Now
+            </button>
+          </div>
         </div>
       )}
     </div>
