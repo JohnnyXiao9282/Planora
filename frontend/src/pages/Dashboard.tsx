@@ -27,22 +27,14 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(120deg, #e0e7ef 0%, #b6c6e6 100%)",
-      }}
-    >
+    <div>
       <nav
         style={{
           display: "flex",
           alignItems: "center",
-          padding: "1.5rem 2rem 1rem 2rem",
-          background: "linear-gradient(90deg, #185a9d 0%, #43cea2 100%)",
+          background: "#185a9d",
           color: "#fff",
-          fontWeight: 700,
-          fontSize: "1.7rem",
-          letterSpacing: "1px",
+          padding: "1rem 2rem",
         }}
       >
         <span
@@ -204,7 +196,7 @@ const Dashboard = () => {
                     }}
                     onClick={() =>
                       navigate("/checkout", {
-                        state: { selectedIds: [t.template_id] },
+                        state: { template: t },
                       })
                     }
                   >

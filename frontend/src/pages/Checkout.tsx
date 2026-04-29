@@ -6,12 +6,15 @@ const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // For demo, get selected templates from location.state or fallback to all
-  const selectedIds: string[] =
-    location.state?.selectedIds || cart.map((t) => t.template_id);
-  const selectedTemplates = cart.filter((t) =>
-    selectedIds.includes(t.template_id)
-  );
+  // If coming from Buy Now, location.state.template will be set
+  let selectedTemplates = [];
+  if (location.state?.template) {
+    selectedTemplates = [location.state.template];
+  } else {
+    const selectedIds: string[] =
+      location.state?.selectedIds || cart.map((t) => t.template_id);
+    selectedTemplates = cart.filter((t) => selectedIds.includes(t.template_id));
+  }
   const total = selectedTemplates.reduce((sum, t) => sum + t.price, 0);
 
   return (
