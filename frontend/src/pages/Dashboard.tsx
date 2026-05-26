@@ -21,7 +21,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetch("/resume-templates")
+    fetch("http://localhost:5050/resume-templates")
       .then((res) => res.json())
       .then((data) => setTemplates(data));
   }, []);
