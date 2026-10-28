@@ -14,7 +14,7 @@ const ChatWidget: React.FC = () => {
     {
       role: "assistant",
       content:
-        "Hi! I'm your resume advisor. Tell me the role you're targeting and your experience level, or paste part of your resume for feedback.",
+        "Hi! I'm your resume advisor. Fill out your Profile and ask \"Which template suits me?\" — I'll read it and find your best match. You can also tell me your target role or paste part of your resume for feedback.",
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
@@ -70,6 +70,7 @@ const ChatWidget: React.FC = () => {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // sends session so the agent can read the user's profile
         body: JSON.stringify({ messages: next.slice(1) }),
       });
       const data = await res.json();

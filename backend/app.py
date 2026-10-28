@@ -8,6 +8,7 @@ from controller.resume_template_controller import resume_template_bp
 from controller.cart_controller import cart_bp
 from controller.checkout_controller import checkout_bp
 from controller.agent_controller import agent_bp
+from controller.profile_controller import profile_bp
 
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ app.register_blueprint(resume_template_bp)
 app.register_blueprint(cart_bp)
 app.register_blueprint(checkout_bp)
 app.register_blueprint(agent_bp)
+app.register_blueprint(profile_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)
