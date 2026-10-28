@@ -42,7 +42,9 @@ const ChatWidget: React.FC = () => {
     if (!resizing) return;
     const onMove = (e: MouseEvent) => {
       const max = Math.max(MIN_WIDTH, window.innerWidth * 0.8);
-      setWidth(Math.min(max, Math.max(MIN_WIDTH, window.innerWidth - e.clientX)));
+      setWidth(
+        Math.min(max, Math.max(MIN_WIDTH, window.innerWidth - e.clientX))
+      );
     };
     const onUp = () => setResizing(false);
     document.body.style.userSelect = "none";

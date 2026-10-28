@@ -33,14 +33,29 @@ interface ResumeTemplate {
 const TemplateDetail = () => {
   const { templateId } = useParams<{ templateId: string }>();
   const [template, setTemplate] = useState<ResumeTemplate | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`/resume-templates/${templateId}`)
-      .then((res) => res.json())
-      .then((data) => setTemplate(data));
+    setTemplate(null);
+    setError(null);
+    fetch(`http://localhost:5050/resume-templates/${templateId}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        return data as ResumeTemplate;
+      })
+      .then((data) => setTemplate(data))
+      .catch((e: Error) => setError(e.message || "Could not load template."));
   }, [templateId]);
 
+  if (error)
+    return (
+      <div style={{ padding: 24 }}>
+        <p>Couldn't load this template: {error}</p>
+        <button type="button" onClick={() => navigate(-1)}>&larr; Back</button>
+      </div>
+    );
   if (!template) return <div>Loading...</div>;
 
   return (
