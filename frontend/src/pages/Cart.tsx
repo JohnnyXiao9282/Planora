@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
+import { formatTemplateName } from "../utils/formatTemplateName";
 import { Link, useNavigate } from "react-router-dom";
 
 const Cart: React.FC = () => {
@@ -181,7 +182,9 @@ const Cart: React.FC = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                <h2 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h2>
+                <h2 style={{ fontSize: 22, marginBottom: 8, overflowWrap: "anywhere" }}>
+                  {formatTemplateName(t.name)}
+                </h2>
                 <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
                 <div
                   style={{

@@ -1,4 +1,5 @@
 import { useCart } from "../context/CartContext";
+import { formatTemplateName } from "../utils/formatTemplateName";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 
 const Checkout: React.FC = () => {
@@ -111,9 +112,9 @@ const Checkout: React.FC = () => {
                       padding: "16px 0",
                     }}
                   >
-                    <div>
+                    <div style={{ minWidth: 0, overflowWrap: "anywhere" }}>
                       <div style={{ fontWeight: 700, fontSize: 20 }}>
-                        {t.name}
+                        {formatTemplateName(t.name)}
                       </div>
                       <div style={{ color: "#666", fontSize: 15 }}>
                         {t.description}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { formatTemplateName } from "../utils/formatTemplateName";
 
 interface Education {
   school: string;
@@ -80,7 +81,9 @@ const TemplateDetail = () => {
           padding: 40,
         }}
       >
-        <h1 style={{ textAlign: "center", fontSize: 32 }}>{template.name}</h1>
+        <h1 style={{ textAlign: "center", fontSize: 32, overflowWrap: "anywhere" }}>
+          {formatTemplateName(template.name)}
+        </h1>
         <section style={{ margin: "2rem 0" }}>
           <h2>Summary</h2>
           <p>{template.summary}</p>

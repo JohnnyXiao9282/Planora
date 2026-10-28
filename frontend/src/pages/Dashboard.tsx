@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { formatTemplateName } from "../utils/formatTemplateName";
 import "../App.css";
 
 interface ResumeTemplateCard {
@@ -145,7 +146,9 @@ const Dashboard = () => {
                 >
                   {inCart ? "In Cart" : "Add to Cart"}
                 </button>
-                <h2 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h2>
+                <h2 style={{ fontSize: 22, marginBottom: 8, overflowWrap: "anywhere" }}>
+                  {formatTemplateName(t.name)}
+                </h2>
                 <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
                 <div
                   style={{
