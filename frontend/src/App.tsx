@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate
+  Navigate,
 } from "react-router-dom";
 
 import Register from "./pages/Register";
@@ -16,6 +16,7 @@ import TemplateDetail from "./pages/TemplateDetail";
 import Home from "./pages/Home";
 import "./App.css";
 import { CartProvider } from "./context/CartContext";
+import ChatWidget from "./components/ChatWidget";
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/template/:templateId" element={<TemplateDetail />} />
         </Routes>
+        <ChatWidget />
       </Router>
     </CartProvider>
   );
