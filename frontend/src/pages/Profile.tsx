@@ -91,6 +91,48 @@ const Profile = () => {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
+  // Auto-save shortly after the user stops typing, so the chat advisor
+  // always sees the latest profile without needing to click Save.
+  const latest = useRef({ profile, dirty });
+  latest.current = { profile, dirty };
+
+  useEffect(() => {
+    if (loading || !dirty) return;
+    const timer = setTimeout(async () => {
+      const body = JSON.stringify(profile);
+      try {
+        const res = await fetch(`${API}/profile`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body,
+        });
+        if (!res.ok) throw new Error();
+        setSavedJson(body); // don't overwrite the fields while the user is typing
+        setStatus("Saved ✓");
+      } catch {
+        setStatus("Auto-save failed — click Save to retry.");
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [profile, dirty, loading]);
+
+  // Flush unsaved changes when navigating away from the page
+  useEffect(
+    () => () => {
+      if (latest.current.dirty) {
+        fetch(`${API}/profile`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          keepalive: true,
+          body: JSON.stringify(latest.current.profile),
+        }).catch(() => {});
+      }
+    },
+    []
+  );
+
   const save = async (next: ProfileData = profile) => {
     setSaving(true);
     try {
