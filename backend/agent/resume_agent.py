@@ -67,24 +67,40 @@ def _call_openai(messages, api_key):
 
 _KEYWORDS = {
     "software": ["software", "sde", "developer", "engineer", "programmer", "full-stack", "backend", "frontend"],
-    "data": ["data", "analyst", "machine learning", "ml", "ai", "scientist"],
+    "data": ["data", "analytics", "sql", "tableau", "bi ", "machine learning", "scientist"],
+    "sales": ["sales", "account executive", "sdr", "bdr", "business development", "quota"],
+    "marketing": ["marketing", "seo", "social media", "brand", "growth", "content", "campaign"],
+    "product": ["product manager", "product management", " pm", "roadmap"],
+    "finance": ["finance", "financial", "fp&a", "accounting", "accountant", "investment", "banking"],
     "student": ["student", "intern", "graduate", "new grad", "college", "university"],
     "design": ["design", "ux", "ui", "creative"],
 }
 
+# Which template fits each role, plus one role-specific tip
+_ROLE_TEMPLATES = {
+    "software": ("template_001", "Lead bullets with strong verbs and quantify impact (e.g. 'reduced latency by 30%')."),
+    "sales": ("template_002", "Put quota attainment and revenue closed front and center (e.g. '124% of quota')."),
+    "marketing": ("template_003", "Show campaign results with metrics like CPA, conversion rate, and traffic growth."),
+    "data": ("template_004", "Pair each tool (SQL, Python, Tableau) with the business decision your analysis drove."),
+    "product": ("template_005", "Frame bullets as outcomes: the metric you moved and the team you led to ship it."),
+    "finance": ("template_006", "Highlight modeling, forecasting accuracy, and dollar amounts of savings or budgets."),
+}
+
 
 def _fallback_reply(user_text):
-    text = user_text.lower()
+    text = " " + user_text.lower()
     catalog = _template_catalog()
+    by_id = {t["template_id"]: t for t in catalog}
     tips = []
     matched = [k for k, words in _KEYWORDS.items() if any(w in text for w in words)]
 
-    if "software" in matched or "data" in matched:
-        t = catalog[0] if catalog else None
-        if t:
-            tips.append(f"I'd recommend **{t['name']}** ({t['template_id']}, ${t['price']}): {t['description']}")
-        tips.append("Lead each bullet with a strong verb and quantify impact (e.g. 'reduced latency by 30%').")
-        tips.append("Put a focused skills section near the top, grouped by languages / frameworks / tools.")
+    for role in matched:
+        if role in _ROLE_TEMPLATES:
+            tid, tip = _ROLE_TEMPLATES[role]
+            t = by_id.get(tid)
+            if t:
+                tips.append(f"I'd recommend **{t['name']}** ({t['template_id']}, ${t['price']}): {t['description']}")
+            tips.append(tip)
     if "student" in matched:
         tips.append("As a student or new grad, place Education first and highlight projects and internships.")
     if "design" in matched:
