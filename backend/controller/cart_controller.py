@@ -19,39 +19,46 @@ def add_cors_headers(response):
 	return response
 
 
-# Use session-based cart so each user has their own cart
-def get_session_cart():
-	if 'cart' not in session:
-		session['cart'] = []
-	return session['cart']
+# Session cookies are limited to ~4KB, so store only template IDs in the
+# session and look up the full templates when responding.
+def get_cart_ids():
+	ids = []
+	for item in session.get('cart', []):
+		# tolerate old sessions that stored full template dicts
+		tid = item.get('template_id') if isinstance(item, dict) else item
+		if tid and tid not in ids:
+			ids.append(tid)
+	return ids
+
+
+def ids_to_templates(ids):
+	by_id = {t['template_id']: t for t in get_all_static()}
+	return [by_id[i] for i in ids if i in by_id]
+
 
 @cart_bp.route('/cart', methods=['GET'])
 def get_cart():
-	cart = session.get('cart', [])
-	return jsonify(cart)
+	return jsonify(ids_to_templates(get_cart_ids()))
 
 @cart_bp.route('/cart', methods=['POST'])
 def add_to_cart():
-	data = request.get_json()
+	data = request.get_json(silent=True) or {}
 	template_id = data.get('template_id')
-	templates = get_all_static()
-	template = next((t for t in templates if t['template_id'] == template_id), None)
-	if not template:
+	if not any(t['template_id'] == template_id for t in get_all_static()):
 		return jsonify({'error': 'Template not found'}), 404
-	cart = get_session_cart()
-	if not any(t['template_id'] == template_id for t in cart):
-		cart.append(template)
-		session['cart'] = cart
-	return jsonify({'success': True, 'cart': cart})
+	ids = get_cart_ids()
+	if template_id not in ids:
+		ids.append(template_id)
+	session['cart'] = ids
+	return jsonify({'success': True, 'cart': ids_to_templates(ids)})
 
 # Remove a template from the cart
 @cart_bp.route('/cart/remove', methods=['POST'])
 def remove_from_cart():
-	data = request.get_json()
+	data = request.get_json(silent=True) or {}
 	template_id = data.get('template_id')
 	if not template_id:
 		return jsonify({'error': 'No template_id provided'}), 400
-	cart = get_session_cart()
-	new_cart = [t for t in cart if t['template_id'] != template_id]
-	session['cart'] = new_cart
-	return jsonify({'success': True, 'cart': new_cart})
+	ids = [i for i in get_cart_ids() if i != template_id]
+	session['cart'] = ids
+	return jsonify({'success': True, 'cart': ids_to_templates(ids)})

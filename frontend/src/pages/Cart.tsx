@@ -153,10 +153,10 @@ const Cart: React.FC = () => {
         ) : (
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
               gap: 24,
-              alignItems: "flex-start",
+              alignItems: "stretch",
             }}
           >
             {cart.map((t) => (
@@ -169,8 +169,7 @@ const Cart: React.FC = () => {
                     ? "0 4px 20px rgba(67, 206, 162, 0.4)"
                     : "0 2px 12px rgba(60,60,130,0.10)",
                   padding: 24,
-                  minWidth: 260,
-                  maxWidth: 320,
+                  minWidth: 0,
                   margin: 0,
                   display: "flex",
                   flexDirection: "column",
