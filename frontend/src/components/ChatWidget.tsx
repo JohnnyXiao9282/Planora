@@ -28,12 +28,16 @@ const ChatWidget: React.FC = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
 
-  // Shift page content so the panel doesn't cover it
+  // Shift page content so the panel doesn't cover it. Fixed-position
+  // elements (e.g. the cart's bottom bar) use the --chat-panel-width variable.
   useEffect(() => {
-    document.body.style.marginRight = open ? `${width}px` : "0px";
+    const offset = open ? `${width}px` : "0px";
+    document.body.style.marginRight = offset;
+    document.documentElement.style.setProperty("--chat-panel-width", offset);
     localStorage.setItem("chatPanelWidth", String(width));
     return () => {
       document.body.style.marginRight = "0px";
+      document.documentElement.style.setProperty("--chat-panel-width", "0px");
     };
   }, [open, width]);
 

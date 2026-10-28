@@ -228,7 +228,7 @@ const Cart: React.FC = () => {
             position: "fixed",
             bottom: 0,
             left: 0,
-            right: 0,
+            right: "var(--chat-panel-width, 0px)", // stay clear of the chat panel
             background: "#fff",
             boxShadow: "0 -4px 20px rgba(0,0,0,0.1)",
             padding: "20px 60px",
