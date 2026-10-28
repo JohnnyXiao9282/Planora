@@ -176,7 +176,7 @@ const Cart: React.FC = () => {
                   position: "relative",
                   border: selectedItems.has(t.template_id)
                     ? "2px solid #43cea2"
-                    : "1px solid #e0e7ef",
+                    : "2px solid #e0e7ef",
                   textAlign: "left",
                   transition: "all 0.3s ease",
                 }}
@@ -190,7 +190,8 @@ const Cart: React.FC = () => {
                     fontWeight: 700,
                     color: "#43cea2",
                     fontSize: 18,
-                    marginTop: 12,
+                    marginTop: "auto",
+                    paddingTop: 12,
                     marginBottom: 16,
                   }}
                 >
