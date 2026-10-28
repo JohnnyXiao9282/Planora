@@ -7,7 +7,13 @@ const API_URL = "http://localhost:5050/agent/chat";
 const MIN_WIDTH = 280;
 
 const ChatWidget: React.FC = () => {
-  const [open, setOpen] = useState(true);
+  // Remember open/closed across pages and reloads; open by default on first visit
+  const [open, setOpen] = useState<boolean>(
+    () => localStorage.getItem("chatPanelOpen") !== "false"
+  );
+  useEffect(() => {
+    localStorage.setItem("chatPanelOpen", String(open));
+  }, [open]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
