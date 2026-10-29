@@ -56,9 +56,12 @@ def add_to_cart():
 @cart_bp.route('/cart/remove', methods=['POST'])
 def remove_from_cart():
 	data = request.get_json(silent=True) or {}
-	template_id = data.get('template_id')
-	if not template_id:
+	# Accept one id or a list, so bulk removal is a single request (parallel
+	# requests would race on the session cookie and only one would stick).
+	ids_to_remove = data.get('template_ids') or ([data['template_id']] if data.get('template_id') else [])
+	if not isinstance(ids_to_remove, list) or not ids_to_remove:
 		return jsonify({'error': 'No template_id provided'}), 400
-	ids = [i for i in get_cart_ids() if i != template_id]
+	remove = set(ids_to_remove)
+	ids = [i for i in get_cart_ids() if i not in remove]
 	session['cart'] = ids
 	return jsonify({'success': True, 'cart': ids_to_templates(ids)})

@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flask import Blueprint, request, jsonify, session
 from repo.resume_template_repository import get_all_static
 
@@ -28,7 +30,8 @@ def checkout():
     history = session.get('purchase_history', [])
     history.append({
         'template_ids': [t['template_id'] for t in selected_templates],
-        'total': sum(t['price'] for t in selected_templates)
+        'total': sum(t['price'] for t in selected_templates),
+        'purchased_at': datetime.now(timezone.utc).isoformat(),
     })
     session['purchase_history'] = history[-20:]
     # Remove purchased items from cart
@@ -50,5 +53,7 @@ def purchase_history():
         result.append({
             'templates': [by_id[i] for i in entry.get('template_ids', []) if i in by_id],
             'total': entry.get('total', 0),
+            'purchased_at': entry.get('purchased_at'),
         })
+    result.reverse()  # newest first
     return jsonify(result)

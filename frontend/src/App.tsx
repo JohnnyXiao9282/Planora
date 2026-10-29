@@ -14,6 +14,7 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import TemplateDetail from "./pages/TemplateDetail";
 import Home from "./pages/Home";
+import PurchaseHistory from "./pages/PurchaseHistory";
 import "./App.css";
 import { CartProvider } from "./context/CartContext";
 import ChatWidget from "./components/ChatWidget";
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/template/:templateId" element={<TemplateDetail />} />
+          <Route path="/purchase-history" element={<PurchaseHistory />} />
         </Routes>
         <ChatWidget />
       </Router>

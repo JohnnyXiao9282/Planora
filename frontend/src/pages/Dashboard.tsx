@@ -146,7 +146,13 @@ const Dashboard = () => {
                 >
                   {inCart ? "In Cart" : "Add to Cart"}
                 </button>
-                <h2 style={{ fontSize: 22, marginBottom: 8, overflowWrap: "anywhere" }}>
+                <h2
+                  style={{
+                    fontSize: 22,
+                    marginBottom: 8,
+                    overflowWrap: "anywhere",
+                  }}
+                >
                   {formatTemplateName(t.name)}
                 </h2>
                 <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>

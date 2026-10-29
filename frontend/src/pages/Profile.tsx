@@ -23,12 +23,28 @@ interface ProfileData {
   skills: string[];
 }
 
-const EMPTY: ProfileData = { intro: "", linkedin_url: "", experience: [], projects: [], skills: [] };
-const STEPS = ["Self Introduction", "Experience", "Projects", "Skills"] as const;
+const EMPTY: ProfileData = {
+  intro: "",
+  linkedin_url: "",
+  experience: [],
+  projects: [],
+  skills: [],
+};
+const STEPS = [
+  "Self Introduction",
+  "Experience",
+  "Projects",
+  "Skills",
+] as const;
 type SectionKey = "intro" | "experience" | "projects" | "skills";
 const STEP_KEYS: SectionKey[] = ["intro", "experience", "projects", "skills"];
 
-const emptyExp = (): Experience => ({ title: "", company: "", dates: "", description: "" });
+const emptyExp = (): Experience => ({
+  title: "",
+  company: "",
+  dates: "",
+  description: "",
+});
 const emptyProj = (): Project => ({ name: "", url: "", description: "" });
 
 const splitSkills = (text: string) =>
@@ -39,10 +55,14 @@ const splitSkills = (text: string) =>
 
 const mergeSkills = (a: string[], b: string[]) => {
   const seen = new Set(a.map((s) => s.toLowerCase()));
-  return [...a, ...b.filter((s) => !seen.has(s.toLowerCase()) && seen.add(s.toLowerCase()))];
+  return [
+    ...a,
+    ...b.filter((s) => !seen.has(s.toLowerCase()) && seen.add(s.toLowerCase())),
+  ];
 };
 
-const withHttp = (url: string) => (/^https?:\/\//i.test(url) ? url : `https://${url}`);
+const withHttp = (url: string) =>
+  /^https?:\/\//i.test(url) ? url : `https://${url}`;
 
 const sectionDone = (p: ProfileData, key: SectionKey) =>
   key === "intro" ? !!p.intro.trim() : p[key].length > 0;
@@ -65,11 +85,17 @@ const Profile = () => {
 
   const [importText, setImportText] = useState("");
   const [importing, setImporting] = useState(false);
-  const [preview, setPreview] = useState<{ profile: ProfileData; method: string } | null>(null);
+  const [preview, setPreview] = useState<{
+    profile: ProfileData;
+    method: string;
+  } | null>(null);
   const [skillInput, setSkillInput] = useState("");
   const importRef = useRef<HTMLTextAreaElement>(null);
 
-  const dirty = useMemo(() => JSON.stringify(profile) !== savedJson, [profile, savedJson]);
+  const dirty = useMemo(
+    () => JSON.stringify(profile) !== savedJson,
+    [profile, savedJson]
+  );
 
   useEffect(() => {
     fetch(`${API}/profile`, { credentials: "include" })
@@ -79,7 +105,9 @@ const Profile = () => {
         setProfile(p);
         setSavedJson(JSON.stringify(p));
       })
-      .catch(() => setStatus("Couldn't load your profile. Is the backend running?"))
+      .catch(() =>
+        setStatus("Couldn't load your profile. Is the backend running?")
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -184,7 +212,9 @@ const Profile = () => {
     if (text) setImportText(text);
     else {
       importRef.current?.focus();
-      setStatus("Clipboard access was blocked — click in the box and press ⌘V / Ctrl+V.");
+      setStatus(
+        "Clipboard access was blocked — click in the box and press ⌘V / Ctrl+V."
+      );
     }
   };
 
@@ -223,11 +253,15 @@ const Profile = () => {
   const pasteIntoSection = async (key: SectionKey) => {
     const text = await readClipboard();
     if (!text) {
-      setStatus("Clipboard access was blocked — paste directly into the fields with ⌘V / Ctrl+V.");
+      setStatus(
+        "Clipboard access was blocked — paste directly into the fields with ⌘V / Ctrl+V."
+      );
       return;
     }
     if (key === "intro") {
-      update({ intro: profile.intro ? `${profile.intro}\n${text.trim()}` : text.trim() });
+      update({
+        intro: profile.intro ? `${profile.intro}\n${text.trim()}` : text.trim(),
+      });
     } else if (key === "skills") {
       update({ skills: mergeSkills(profile.skills, splitSkills(text)) });
     } else {
@@ -236,7 +270,10 @@ const Profile = () => {
         const heading = key === "experience" ? "Experience" : "Projects";
         const { profile: parsed } = await parseText(`${heading}\n${text}`);
         const items = parsed[key] as (Experience | Project)[];
-        if (items.length) update({ [key]: [...(profile[key] as (Experience | Project)[]), ...items] } as Partial<ProfileData>);
+        if (items.length)
+          update({
+            [key]: [...(profile[key] as (Experience | Project)[]), ...items],
+          } as Partial<ProfileData>);
         else setStatus("Couldn't find any entries in the pasted text.");
       } catch (e) {
         setStatus((e as Error).message);
@@ -246,9 +283,17 @@ const Profile = () => {
 
   // ---- Section editors ----
   const setExp = (i: number, patch: Partial<Experience>) =>
-    update({ experience: profile.experience.map((e, j) => (j === i ? { ...e, ...patch } : e)) });
+    update({
+      experience: profile.experience.map((e, j) =>
+        j === i ? { ...e, ...patch } : e
+      ),
+    });
   const setProj = (i: number, patch: Partial<Project>) =>
-    update({ projects: profile.projects.map((p, j) => (j === i ? { ...p, ...patch } : p)) });
+    update({
+      projects: profile.projects.map((p, j) =>
+        j === i ? { ...p, ...patch } : p
+      ),
+    });
 
   const addSkillsFromInput = () => {
     const parts = splitSkills(skillInput);
@@ -257,7 +302,11 @@ const Profile = () => {
   };
 
   const PasteBtn = ({ k }: { k: SectionKey }) => (
-    <button type="button" className="btn-ghost" onClick={() => pasteIntoSection(k)}>
+    <button
+      type="button"
+      className="btn-ghost"
+      onClick={() => pasteIntoSection(k)}
+    >
       📋 Paste
     </button>
   );
@@ -270,7 +319,9 @@ const Profile = () => {
             <div className="section-head">
               <div>
                 <h2>Self Introduction</h2>
-                <p className="hint">Who you are, what you do, and the role you're aiming for.</p>
+                <p className="hint">
+                  Who you are, what you do, and the role you're aiming for.
+                </p>
               </div>
               <PasteBtn k="intro" />
             </div>
@@ -281,7 +332,9 @@ const Profile = () => {
               placeholder="e.g. I'm a data analyst with 2 years of experience turning messy data into dashboards. I'm looking for a senior analyst role in fintech."
               onChange={(e) => update({ intro: e.target.value })}
             />
-            <label className="label" htmlFor="linkedin-url">LinkedIn URL</label>
+            <label className="label" htmlFor="linkedin-url">
+              LinkedIn URL
+            </label>
             <div className="row">
               <input
                 id="linkedin-url"
@@ -291,7 +344,12 @@ const Profile = () => {
                 onChange={(e) => update({ linkedin_url: e.target.value })}
               />
               {profile.linkedin_url && (
-                <a className="btn-ghost" href={withHttp(profile.linkedin_url)} target="_blank" rel="noreferrer">
+                <a
+                  className="btn-ghost"
+                  href={withHttp(profile.linkedin_url)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Open ↗
                 </a>
               )}
@@ -304,17 +362,37 @@ const Profile = () => {
             <div className="section-head">
               <div>
                 <h2>Experience</h2>
-                <p className="hint">Jobs, internships, and roles. Paste copied LinkedIn experience to fill these in.</p>
+                <p className="hint">
+                  Jobs, internships, and roles. Paste copied LinkedIn experience
+                  to fill these in.
+                </p>
               </div>
               <PasteBtn k="experience" />
             </div>
-            {profile.experience.length === 0 && <p className="empty">No experience added yet.</p>}
+            {profile.experience.length === 0 && (
+              <p className="empty">No experience added yet.</p>
+            )}
             {profile.experience.map((e, i) => (
               <div className="entry" key={i}>
                 <div className="grid3">
-                  <input className="field" placeholder="Title" value={e.title} onChange={(ev) => setExp(i, { title: ev.target.value })} />
-                  <input className="field" placeholder="Company" value={e.company} onChange={(ev) => setExp(i, { company: ev.target.value })} />
-                  <input className="field" placeholder="Dates (e.g. Jan 2022 – Present)" value={e.dates} onChange={(ev) => setExp(i, { dates: ev.target.value })} />
+                  <input
+                    className="field"
+                    placeholder="Title"
+                    value={e.title}
+                    onChange={(ev) => setExp(i, { title: ev.target.value })}
+                  />
+                  <input
+                    className="field"
+                    placeholder="Company"
+                    value={e.company}
+                    onChange={(ev) => setExp(i, { company: ev.target.value })}
+                  />
+                  <input
+                    className="field"
+                    placeholder="Dates (e.g. Jan 2022 – Present)"
+                    value={e.dates}
+                    onChange={(ev) => setExp(i, { dates: ev.target.value })}
+                  />
                 </div>
                 <textarea
                   className="field"
@@ -323,12 +401,26 @@ const Profile = () => {
                   value={e.description}
                   onChange={(ev) => setExp(i, { description: ev.target.value })}
                 />
-                <button type="button" className="btn-remove" onClick={() => update({ experience: profile.experience.filter((_, j) => j !== i) })}>
+                <button
+                  type="button"
+                  className="btn-remove"
+                  onClick={() =>
+                    update({
+                      experience: profile.experience.filter((_, j) => j !== i),
+                    })
+                  }
+                >
                   Remove
                 </button>
               </div>
             ))}
-            <button type="button" className="btn-add" onClick={() => update({ experience: [...profile.experience, emptyExp()] })}>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={() =>
+                update({ experience: [...profile.experience, emptyExp()] })
+              }
+            >
               + Add experience
             </button>
           </>
@@ -339,19 +431,38 @@ const Profile = () => {
             <div className="section-head">
               <div>
                 <h2>Projects</h2>
-                <p className="hint">Link your work — GitHub repos, portfolios, live demos.</p>
+                <p className="hint">
+                  Link your work — GitHub repos, portfolios, live demos.
+                </p>
               </div>
               <PasteBtn k="projects" />
             </div>
-            {profile.projects.length === 0 && <p className="empty">No projects added yet.</p>}
+            {profile.projects.length === 0 && (
+              <p className="empty">No projects added yet.</p>
+            )}
             {profile.projects.map((p, i) => (
               <div className="entry" key={i}>
                 <div className="grid2">
-                  <input className="field" placeholder="Project name" value={p.name} onChange={(ev) => setProj(i, { name: ev.target.value })} />
+                  <input
+                    className="field"
+                    placeholder="Project name"
+                    value={p.name}
+                    onChange={(ev) => setProj(i, { name: ev.target.value })}
+                  />
                   <div className="row">
-                    <input className="field" placeholder="Link (https://github.com/...)" value={p.url} onChange={(ev) => setProj(i, { url: ev.target.value })} />
+                    <input
+                      className="field"
+                      placeholder="Link (https://github.com/...)"
+                      value={p.url}
+                      onChange={(ev) => setProj(i, { url: ev.target.value })}
+                    />
                     {p.url && (
-                      <a className="btn-ghost" href={withHttp(p.url)} target="_blank" rel="noreferrer">
+                      <a
+                        className="btn-ghost"
+                        href={withHttp(p.url)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         ↗
                       </a>
                     )}
@@ -362,14 +473,30 @@ const Profile = () => {
                   rows={3}
                   placeholder="What it does, your role, and the tech you used"
                   value={p.description}
-                  onChange={(ev) => setProj(i, { description: ev.target.value })}
+                  onChange={(ev) =>
+                    setProj(i, { description: ev.target.value })
+                  }
                 />
-                <button type="button" className="btn-remove" onClick={() => update({ projects: profile.projects.filter((_, j) => j !== i) })}>
+                <button
+                  type="button"
+                  className="btn-remove"
+                  onClick={() =>
+                    update({
+                      projects: profile.projects.filter((_, j) => j !== i),
+                    })
+                  }
+                >
                   Remove
                 </button>
               </div>
             ))}
-            <button type="button" className="btn-add" onClick={() => update({ projects: [...profile.projects, emptyProj()] })}>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={() =>
+                update({ projects: [...profile.projects, emptyProj()] })
+              }
+            >
               + Add project
             </button>
           </>
@@ -380,7 +507,10 @@ const Profile = () => {
             <div className="section-head">
               <div>
                 <h2>Skills</h2>
-                <p className="hint">Type a skill and press Enter or comma. Pasting a comma-separated list adds them all.</p>
+                <p className="hint">
+                  Type a skill and press Enter or comma. Pasting a
+                  comma-separated list adds them all.
+                </p>
               </div>
               <PasteBtn k="skills" />
             </div>
@@ -388,7 +518,13 @@ const Profile = () => {
               {profile.skills.map((s) => (
                 <span className="chip" key={s}>
                   {s}
-                  <button type="button" aria-label={`Remove ${s}`} onClick={() => update({ skills: profile.skills.filter((x) => x !== s) })}>
+                  <button
+                    type="button"
+                    aria-label={`Remove ${s}`}
+                    onClick={() =>
+                      update({ skills: profile.skills.filter((x) => x !== s) })
+                    }
+                  >
                     ×
                   </button>
                 </span>
@@ -396,11 +532,17 @@ const Profile = () => {
               <input
                 className="chip-input"
                 value={skillInput}
-                placeholder={profile.skills.length ? "Add more…" : "e.g. SQL, Python, Salesforce"}
+                placeholder={
+                  profile.skills.length
+                    ? "Add more…"
+                    : "e.g. SQL, Python, Salesforce"
+                }
                 onChange={(e) => {
                   const v = e.target.value;
                   if (/[,;\n]/.test(v)) {
-                    update({ skills: mergeSkills(profile.skills, splitSkills(v)) });
+                    update({
+                      skills: mergeSkills(profile.skills, splitSkills(v)),
+                    });
                     setSkillInput("");
                   } else setSkillInput(v);
                 }}
@@ -408,7 +550,11 @@ const Profile = () => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     addSkillsFromInput();
-                  } else if (e.key === "Backspace" && !skillInput && profile.skills.length) {
+                  } else if (
+                    e.key === "Backspace" &&
+                    !skillInput &&
+                    profile.skills.length
+                  ) {
                     update({ skills: profile.skills.slice(0, -1) });
                   }
                 }}
@@ -420,7 +566,12 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div className="profile-page"><p style={{ padding: 40 }}>Loading profile…</p></div>;
+  if (loading)
+    return (
+      <div className="profile-page">
+        <p style={{ padding: 40 }}>Loading profile…</p>
+      </div>
+    );
 
   return (
     <div className="profile-page">
@@ -429,22 +580,25 @@ const Profile = () => {
         <Link to="/dashboard">Templates</Link>
         <Link to="/cart">Cart</Link>
         <Link to="/checkout">Checkout</Link>
-        <Link to="/profile" className="active">Profile</Link>
+        <Link to="/profile" className="active">
+          Profile
+        </Link>
       </nav>
 
       <main className="profile-main">
         <h1>Your Profile</h1>
         <p className="hint">
-          Fill this out section by section. The resume advisor in the chat panel reads it to recommend the best
-          template for you.
+          Fill this out section by section. The resume advisor in the chat panel
+          reads it to recommend the best template for you.
         </p>
 
         {/* Import from LinkedIn / resume */}
         <section className="card import-card">
           <h3>Import from LinkedIn or a resume</h3>
           <p className="hint">
-            Open your LinkedIn profile, select all (⌘A / Ctrl+A), copy, and paste it here — or paste your resume text.
-            We'll split it into the four sections for you to review.
+            Open your LinkedIn profile, select all (⌘A / Ctrl+A), copy, and
+            paste it here — or paste your resume text. We'll split it into the
+            four sections for you to review.
           </p>
           <textarea
             ref={importRef}
@@ -455,8 +609,19 @@ const Profile = () => {
             onChange={(e) => setImportText(e.target.value)}
           />
           <div className="row end">
-            <button type="button" className="btn-ghost" onClick={pasteIntoImportBox}>📋 Paste from clipboard</button>
-            <button type="button" className="btn-primary" disabled={!importText.trim() || importing} onClick={runImport}>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={pasteIntoImportBox}
+            >
+              📋 Paste from clipboard
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={!importText.trim() || importing}
+              onClick={runImport}
+            >
               {importing ? "Reading…" : "Import"}
             </button>
           </div>
@@ -465,13 +630,38 @@ const Profile = () => {
             <div className="preview">
               <strong>Found:</strong>{" "}
               {preview.profile.intro ? "an introduction, " : ""}
-              {preview.profile.experience.length} experience entr{preview.profile.experience.length === 1 ? "y" : "ies"},{" "}
-              {preview.profile.projects.length} project(s), {preview.profile.skills.length} skill(s)
-              {preview.method === "basic" && <span className="hint"> (basic parser — review the results)</span>}
+              {preview.profile.experience.length} experience entr
+              {preview.profile.experience.length === 1 ? "y" : "ies"},{" "}
+              {preview.profile.projects.length} project(s),{" "}
+              {preview.profile.skills.length} skill(s)
+              {preview.method === "basic" && (
+                <span className="hint">
+                  {" "}
+                  (basic parser — review the results)
+                </span>
+              )}
               <div className="row end">
-                <button type="button" className="btn-ghost" onClick={() => setPreview(null)}>Cancel</button>
-                <button type="button" className="btn-ghost" onClick={() => applyImport("replace")}>Replace my profile</button>
-                <button type="button" className="btn-primary" onClick={() => applyImport("merge")}>Add to my profile</button>
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  onClick={() => setPreview(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  onClick={() => applyImport("replace")}
+                >
+                  Replace my profile
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => applyImport("merge")}
+                >
+                  Add to my profile
+                </button>
               </div>
             </div>
           )}
@@ -483,10 +673,14 @@ const Profile = () => {
             <li key={label}>
               <button
                 type="button"
-                className={`step ${i === step ? "current" : ""} ${sectionDone(profile, STEP_KEYS[i]) ? "done" : ""}`}
+                className={`step ${i === step ? "current" : ""} ${
+                  sectionDone(profile, STEP_KEYS[i]) ? "done" : ""
+                }`}
                 onClick={() => goTo(i)}
               >
-                <span className="num">{sectionDone(profile, STEP_KEYS[i]) ? "✓" : i + 1}</span>
+                <span className="num">
+                  {sectionDone(profile, STEP_KEYS[i]) ? "✓" : i + 1}
+                </span>
                 {label}
               </button>
             </li>
@@ -496,20 +690,41 @@ const Profile = () => {
         <section className="card">{renderSection()}</section>
 
         <div className="footer-bar">
-          <button type="button" className="btn-ghost" disabled={step === 0} onClick={() => goTo(step - 1)}>
+          <button
+            type="button"
+            className="btn-ghost"
+            disabled={step === 0}
+            onClick={() => goTo(step - 1)}
+          >
             ← Back
           </button>
-          <span className="status">{saving ? "Saving…" : status || (dirty ? "Unsaved changes" : "")}</span>
+          <span className="status">
+            {saving ? "Saving…" : status || (dirty ? "Unsaved changes" : "")}
+          </span>
           <div className="row">
-            <button type="button" className="btn-ghost" disabled={!dirty || saving} onClick={() => save()}>
+            <button
+              type="button"
+              className="btn-ghost"
+              disabled={!dirty || saving}
+              onClick={() => save()}
+            >
               Save
             </button>
             {step < STEPS.length - 1 ? (
-              <button type="button" className="btn-primary" onClick={() => goTo(step + 1)}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => goTo(step + 1)}
+              >
                 Next: {STEPS[step + 1]} →
               </button>
             ) : (
-              <button type="button" className="btn-primary" disabled={saving} onClick={() => save()}>
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={saving}
+                onClick={() => save()}
+              >
                 Save profile
               </button>
             )}

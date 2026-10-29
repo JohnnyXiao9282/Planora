@@ -43,7 +43,8 @@ const TemplateDetail = () => {
     fetch(`http://localhost:5050/resume-templates/${templateId}`)
       .then(async (res) => {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        if (!res.ok)
+          throw new Error(data.error || `Request failed (${res.status})`);
         return data as ResumeTemplate;
       })
       .then((data) => setTemplate(data))
@@ -54,7 +55,9 @@ const TemplateDetail = () => {
     return (
       <div style={{ padding: 24 }}>
         <p>Couldn't load this template: {error}</p>
-        <button type="button" onClick={() => navigate(-1)}>&larr; Back</button>
+        <button type="button" onClick={() => navigate(-1)}>
+          &larr; Back
+        </button>
       </div>
     );
   if (!template) return <div>Loading...</div>;
@@ -81,7 +84,13 @@ const TemplateDetail = () => {
           padding: 40,
         }}
       >
-        <h1 style={{ textAlign: "center", fontSize: 32, overflowWrap: "anywhere" }}>
+        <h1
+          style={{
+            textAlign: "center",
+            fontSize: 32,
+            overflowWrap: "anywhere",
+          }}
+        >
           {formatTemplateName(template.name)}
         </h1>
         <section style={{ margin: "2rem 0" }}>

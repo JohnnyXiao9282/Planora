@@ -1,22 +1,35 @@
-import { useCart } from "../context/CartContext";
+import { useEffect } from "react";
+import { useCart, CartItem } from "../context/CartContext";
 import { formatTemplateName } from "../utils/formatTemplateName";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 
 const Checkout: React.FC = () => {
-  const { cart } = useCart();
+  const { cart, refreshCart, checkoutIds, moveBackToCart } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // If coming from Buy Now, location.state.template will be set
-  let selectedTemplates = [];
+  // Re-sync with the server on open and when the tab regains focus, so items
+  // removed elsewhere (e.g. another tab) drop out of the order summary.
+  useEffect(() => {
+    refreshCart();
+    window.addEventListener("focus", refreshCart);
+    return () => window.removeEventListener("focus", refreshCart);
+  }, [refreshCart]);
+
+  // If coming from Buy Now, location.state.template will be set.
+  // Otherwise only show items the user selected in the cart (empty if they
+  // came here directly). Filtering against the live cart means items removed
+  // from the cart disappear from checkout too.
+  let selectedTemplates: CartItem[] = [];
   if (location.state?.template) {
     selectedTemplates = [location.state.template];
   } else {
-    const selectedIds: string[] =
-      location.state?.selectedIds || cart.map((t) => t.template_id);
-    selectedTemplates = cart.filter((t) => selectedIds.includes(t.template_id));
+    selectedTemplates = cart.filter((t) => checkoutIds.includes(t.template_id));
   }
   const total = selectedTemplates.reduce((sum, t) => sum + t.price, 0);
+
+  // Move one item out of checkout and back to the cart
+  const removeFromOrder = (id: string) => moveBackToCart(id);
 
   return (
     <div
@@ -97,7 +110,10 @@ const Checkout: React.FC = () => {
         >
           <h2 style={{ fontSize: 32, marginBottom: 24 }}>Order Summary</h2>
           {selectedTemplates.length === 0 ? (
-            <p>No templates selected for checkout.</p>
+            <p>
+              No templates selected for checkout. Select items in your{" "}
+              <Link to="/cart">Cart</Link> and click Checkout.
+            </p>
           ) : (
             <>
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -122,12 +138,43 @@ const Checkout: React.FC = () => {
                     </div>
                     <div
                       style={{
-                        fontWeight: 700,
-                        color: "#43cea2",
-                        fontSize: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 16,
+                        flexShrink: 0,
                       }}
                     >
-                      ${t.price.toFixed(2)}
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: "#43cea2",
+                          fontSize: 20,
+                        }}
+                      >
+                        ${t.price.toFixed(2)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFromOrder(t.template_id)}
+                        aria-label={`Remove ${formatTemplateName(
+                          t.name
+                        )} from this order`}
+                        title="Remove from order (stays in your cart)"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          border: "1px solid #e0b4b0",
+                          background: "#fff5f4",
+                          color: "#c0392b",
+                          fontSize: 22,
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          cursor: "pointer",
+                        }}
+                      >
+                        −
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -182,7 +229,9 @@ const Checkout: React.FC = () => {
         >
           <button
             type="button"
-            onClick={() => navigate("/profile")}
+            onClick={() =>
+              navigate("/purchase-history", { state: { fromCheckout: true } })
+            }
             style={{
               width: "100%",
               padding: "14px 0",

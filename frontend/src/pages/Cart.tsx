@@ -1,11 +1,39 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { formatTemplateName } from "../utils/formatTemplateName";
 import { Link, useNavigate } from "react-router-dom";
 
 const Cart: React.FC = () => {
-  const { cart, removeFromCart } = useCart();
+  const {
+    cart: fullCart,
+    removeFromCart,
+    checkoutIds,
+    moveToCheckout,
+  } = useCart();
+  // Items already moved to checkout are hidden here until moved back
+  const cart = fullCart.filter((t) => !checkoutIds.includes(t.template_id));
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const bottomBarRef = useRef<HTMLDivElement>(null);
+
+  // Publish the bottom bar's height so the chat button can sit above it
+  const barVisible = selectedItems.size > 0;
+  useEffect(() => {
+    const root = document.documentElement.style;
+    const el = bottomBarRef.current;
+    if (!barVisible || !el) {
+      root.setProperty("--bottom-bar-height", "0px");
+      return;
+    }
+    const sync = () =>
+      root.setProperty("--bottom-bar-height", `${el.offsetHeight}px`);
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.setProperty("--bottom-bar-height", "0px");
+    };
+  }, [barVisible]);
   const navigate = useNavigate();
 
   const handleSelectItem = (template_id: string) => {
@@ -29,7 +57,9 @@ const Cart: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    // Optionally, you can pass selected items via state or context
+    // Move the selected items into checkout (out of the cart view)
+    moveToCheckout(Array.from(selectedItems));
+    setSelectedItems(new Set());
     navigate("/checkout");
   };
 
@@ -38,9 +68,7 @@ const Cart: React.FC = () => {
     .reduce((sum, item) => sum + item.price, 0);
 
   const handleRemoveSelected = () => {
-    Array.from(selectedItems).forEach((id) => {
-      removeFromCart(id);
-    });
+    removeFromCart(Array.from(selectedItems)); // one request for all items
     setSelectedItems(new Set());
   };
 
@@ -181,7 +209,13 @@ const Cart: React.FC = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                <h2 style={{ fontSize: 22, marginBottom: 8, overflowWrap: "anywhere" }}>
+                <h2
+                  style={{
+                    fontSize: 22,
+                    marginBottom: 8,
+                    overflowWrap: "anywhere",
+                  }}
+                >
                   {formatTemplateName(t.name)}
                 </h2>
                 <p style={{ color: "#666", minHeight: 48 }}>{t.description}</p>
@@ -224,6 +258,7 @@ const Cart: React.FC = () => {
       </main>
       {selectedItems.size > 0 && (
         <div
+          ref={bottomBarRef}
           style={{
             position: "fixed",
             bottom: 0,

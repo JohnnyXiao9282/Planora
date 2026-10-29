@@ -101,7 +101,10 @@ body {
 .chat-toggle {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: calc(
+    var(--bottom-bar-height, 0px) + 20px
+  ); /* sit above page bottom bars */
+  transition: bottom 0.2s ease;
   width: 56px;
   height: 56px;
   border-radius: 50%;
